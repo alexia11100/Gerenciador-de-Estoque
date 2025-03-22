@@ -1,5 +1,5 @@
 from unittest import TestCase
-from models import Produto
+from models import Produto, Estoque
 
 class ProdutoTests(TestCase):
     def test_criar_produto_com_sucesso(self):
@@ -45,5 +45,63 @@ class ProdutoTests(TestCase):
             Produto(nome, peso, preco, tipo, data_de_compra, validade_original, validade_armazenado)
         self.assertEqual(str(error.exception), "Preço tem que ser em float.")
 
+
+class EstoqueTests(TestCase):
+    def test_adicionar_produto_com_sucesso(self):
+        produto = Produto("Arroz", 4.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+        estoque = Estoque()
+        estoque.adicionar_produto(produto)
         
+        self.assertEqual(len(estoque.listar_produtos()), 1)
+        self.assertEqual(estoque.listar_produtos()[0], produto)
+
+    def test_adicionar_produto_invalido(self):
+        estoque = Estoque()
+        
+        with self.assertRaises(ValueError) as error:
+            estoque.adicionar_produto("Test")
+        self.assertEqual(str(error.exception), "Produto deve ser do tipo Produto.")
+
+    def test_calcular_peso_com_sucesso(self):
+        produto_1 = Produto("Arroz", 4.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+        produto_2 = Produto("Arroz", 10.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+
+        estoque = Estoque()
+        estoque.adicionar_produto(produto_1)
+        estoque.adicionar_produto(produto_2)
+        self.assertEqual(estoque.calcular_peso("Arroz"), 14.0)
     
+    def test_calcular_peso_com_nome_invalido(self):
+        produto_1 = Produto("Arroz", 4.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+        produto_2 = Produto("Arroz", 10.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+
+        estoque = Estoque()
+        estoque.adicionar_produto(produto_1)
+        estoque.adicionar_produto(produto_2)
+        
+        with self.assertRaises(ValueError) as error:
+            estoque.calcular_peso(12)
+        self.assertEqual(str(error.exception), "Nome produto tem que ser uma string.")
+
+    def test_listar_produtos_com_sucesso(self):
+        produto_1 = Produto("Arroz", 4.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+        produto_2 = Produto("Arroz", 10.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+
+        estoque = Estoque()
+        self.assertEqual(len(estoque.listar_produtos()), 0)
+        estoque.adicionar_produto(produto_1)
+        estoque.adicionar_produto(produto_2)
+        self.assertEqual(len(estoque.listar_produtos()), 2)
+    
+    def test_listar_produtos_nome_invalido(self):
+        produto_1 = Produto("Arroz", 4.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+        produto_2 = Produto("Arroz", 10.0, 5.0, "Alimento", "12/12/2024", "12/12/2024", "12/12/2024")
+
+        estoque = Estoque()
+        estoque.adicionar_produto(produto_1)
+        estoque.adicionar_produto(produto_2)
+        
+        with self.assertRaises(ValueError) as error:
+            estoque.listar_produtos(1)
+        self.assertEqual(str(error.exception), "Nome produto tem que ser uma string.")
+
